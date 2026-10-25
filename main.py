@@ -20,10 +20,15 @@ async def new_lead(lead: LeadInput, x_api_key: str = Header(None)):
     # Validação da sua chave de segurança
     if x_api_key != "sucesso@2029":
         raise HTTPException(status_code=401, detail="Não autorizado")
-    
     try:
-        # Usa o modelo Gemini 1.5 Flash
-        model = genai.GenerativeModel("gemini-1.5-flash")
+        # Pega o primeiro modelo disponível automaticamente na sua API Key, zerando qualquer erro de nome
+        model_name = "gemini-1.5-flash"
+        for m in genai.list_models():
+            if 'generateContent' in m.supported_generation_methods:
+                model_name = m.name
+                break
+                
+        model = genai.GenerativeModel(model_name)
         
         prompt = f"""
         Você é um SDR experiente. Analise o seguinte lead e gere uma resposta personalizada de qualificação:
@@ -34,7 +39,6 @@ async def new_lead(lead: LeadInput, x_api_key: str = Header(None)):
         - Segmento: {lead.segment}
         """
         
-        # Garante a chamada direta sem cair na versão incompatível
         response = model.generate_content(prompt)
         return {"status": "success", "response": response.text}
         
