@@ -22,8 +22,8 @@ async def new_lead(lead: LeadInput, x_api_key: str = Header(None)):
         raise HTTPException(status_code=401, detail="Não autorizado")
     
     try:
-        # Inicializa o modelo correto do Gemini
-        model = genai.GenerativeModel("gemini-1.5-flash")
+        # Usando o gemini-pro para garantir compatibilidade total imediata
+        model = genai.GenerativeModel("gemini-pro")
         
         prompt = f"""
         Você é um SDR experiente. Analise o seguinte lead e gere uma resposta personalizada de qualificação:
