@@ -3,7 +3,7 @@ from fastapi import FastAPI, Header, HTTPException
 from pydantic import BaseModel
 import google.generativeai as genai
 
-# Configura a API Key do Gemini através da variável de ambiente no Render
+# Configura a API Key do Gemini
 genai.configure(api_key=os.environ.get("GEMINI_API_KEY"))
 
 app = FastAPI()
@@ -22,7 +22,7 @@ async def new_lead(lead: LeadInput, x_api_key: str = Header(None)):
         raise HTTPException(status_code=401, detail="Não autorizado")
     
     try:
-        # Usa o modelo ativo recomendado pelo Google
+        # Usa o modelo Gemini 1.5 Flash
         model = genai.GenerativeModel("gemini-1.5-flash")
         
         prompt = f"""
@@ -34,6 +34,7 @@ async def new_lead(lead: LeadInput, x_api_key: str = Header(None)):
         - Segmento: {lead.segment}
         """
         
+        # Garante a chamada direta sem cair na versão incompatível
         response = model.generate_content(prompt)
         return {"status": "success", "response": response.text}
         
