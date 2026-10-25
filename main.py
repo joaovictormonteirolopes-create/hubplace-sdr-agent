@@ -3,7 +3,7 @@ from fastapi import FastAPI, Header, HTTPException
 from pydantic import BaseModel
 import google.generativeai as genai
 
-# Configura a API Key do Gemini
+# Configura a API Key do Gemini através da variável de ambiente no Render
 genai.configure(api_key=os.environ.get("GEMINI_API_KEY"))
 
 app = FastAPI()
@@ -20,15 +20,10 @@ async def new_lead(lead: LeadInput, x_api_key: str = Header(None)):
     # Validação da sua chave de segurança
     if x_api_key != "sucesso@2029":
         raise HTTPException(status_code=401, detail="Não autorizado")
+    
     try:
-        # Pega o primeiro modelo disponível automaticamente na sua API Key, zerando qualquer erro de nome
-        model_name = "gemini-1.5-flash"
-        for m in genai.list_models():
-            if 'generateContent' in m.supported_generation_methods:
-                model_name = m.name
-                break
-                
-        model = genai.GenerativeModel(model_name)
+        # Usando o modelo atual recomendado pela API do Google
+        model = genai.GenerativeModel("gemini-3.8-flash")
         
         prompt = f"""
         Você é um SDR experiente. Analise o seguinte lead e gere uma resposta personalizada de qualificação:
