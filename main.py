@@ -1,13 +1,12 @@
 import os
-import google.generativeai as genai
 from fastapi import FastAPI, Header, HTTPException
 from pydantic import BaseModel
+import google.generativeai as genai
 
-app = FastAPI()
-
-# Configura o Gemini com a chave que colocamos no Render
+# Configura a API Key do Gemini através da variável de ambiente do Render
 genai.configure(api_key=os.environ.get("GEMINI_API_KEY"))
 
+app = FastAPI()
 
 class LeadInput(BaseModel):
     name: str
@@ -16,17 +15,16 @@ class LeadInput(BaseModel):
     role: str
     segment: str
 
-
 @app.post("/api/leads/new")
 async def new_lead(lead: LeadInput, x_api_key: str = Header(None)):
-    # Validação da sua chave do Make
+    # Validação da sua chave de segurança
     if x_api_key != "sucesso@2029":
         raise HTTPException(status_code=401, detail="Não autorizado")
-
+    
     try:
-        # Usa o modelo gratuito e rápido do Gemini
-        model = genai.GenerativeModel("models/gemini-1.5-flash")
-
+        # Inicializa o modelo correto do Gemini
+        model = genai.GenerativeModel("gemini-1.5-flash")
+        
         prompt = f"""
         Você é um SDR experiente. Analise o seguinte lead e gere uma resposta personalizada de qualificação:
         - Nome: {lead.name}
@@ -35,16 +33,9 @@ async def new_lead(lead: LeadInput, x_api_key: str = Header(None)):
         - Cargo: {lead.role}
         - Segmento: {lead.segment}
         """
-
+        
         response = model.generate_content(prompt)
-
-        return {
-            "status": "success",
-            "lead_name": lead.name,
-            "sdr_response": response.text,
-        }
-
+        return {"status": "success", "response": response.text}
+        
     except Exception as e:
-        raise HTTPException(
-            status_code=500, detail=f"Erro ao processar a IA: {str(e)}"
-        ) 
+        raise HTTPException(status_code=500, detail=f"Erro ao processar a IA: {str(e)}")
