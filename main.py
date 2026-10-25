@@ -3,7 +3,7 @@ from fastapi import FastAPI, Header, HTTPException
 from pydantic import BaseModel
 import google.generativeai as genai
 
-# Configura a API Key do Gemini através da variável de ambiente do Render
+# Configura a API Key do Gemini através da variável de ambiente no Render
 genai.configure(api_key=os.environ.get("GEMINI_API_KEY"))
 
 app = FastAPI()
@@ -22,8 +22,8 @@ async def new_lead(lead: LeadInput, x_api_key: str = Header(None)):
         raise HTTPException(status_code=401, detail="Não autorizado")
     
     try:
-        # Usando o gemini-pro para garantir compatibilidade total imediata
-        model = genai.GenerativeModel("gemini-pro")
+        # Usa o modelo ativo recomendado pelo Google
+        model = genai.GenerativeModel("gemini-1.5-flash")
         
         prompt = f"""
         Você é um SDR experiente. Analise o seguinte lead e gere uma resposta personalizada de qualificação:
