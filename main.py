@@ -25,7 +25,7 @@ async def new_lead(lead: LeadInput, x_api_key: str = Header(None)):
 
     try:
         # Usa o modelo gratuito e rápido do Gemini
-        model = genai.GenerativeModel("gemini-1.5-flash")
+        model = genai.GenerativeModel("models/gemini-1.5-flash")
 
         prompt = f"""
         Você é um SDR experiente. Analise o seguinte lead e gere uma resposta personalizada de qualificação:
